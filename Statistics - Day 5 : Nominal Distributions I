@@ -1,0 +1,91 @@
+import java.io.*;
+import java.util.*;
+
+interface MathematicalFunction {
+    public double apply(double x);
+}
+
+class NormalDistribution implements MathematicalFunction {
+    private final double mu;
+    private final double sigma;
+    
+    public NormalDistribution(double mu, double sigma) {
+        this.mu = mu;
+        this.sigma = sigma;
+    }
+    
+    public double apply(double x) {
+        return Math.pow(Math.E, -(Math.pow(x - mu, 2) / (2 * Math.pow(sigma, 2)))) / (sigma * Math.sqrt(2 * Math.PI));
+    }
+}
+
+
+public class Solution {
+
+    public static double integrate(MathematicalFunction f, double a, double b) {
+        double dx = 1e-5;
+        double sum = 0;
+        for(double x = a; x <= b; x += dx)
+            sum += f.apply(x) * dx;
+        return sum;
+    }
+    
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        double mu = in.nextDouble();
+        double sigma = in.nextDouble();
+        double upperSolo = in.nextDouble();
+        double lower = in.nextDouble();
+        double upper = in.nextDouble();
+        in.close();
+        
+        MathematicalFunction distribution = new NormalDistribution(mu, sigma);
+        double p1 = integrate(distribution, mu - 5 * sigma, upperSolo);
+        double p2 = integrate(distribution, lower, upper);
+        System.out.printf("%.3f\n%.3f\n", p1, p2);
+    }
+}
+
+
+
+
+/*
+Or we can use the following code
+*/
+
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+
+   // public static void main(String[] args) {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+    
+     public static double erf(double z) {
+        double t = 1.0 / (1.0 + 0.5 * Math.abs(z));
+        double ans = 1 - t * Math.exp( -z*z   -   1.26551223 +
+                                            t * ( 1.00002368 +
+                                            t * ( 0.37409196 + 
+                                            t * ( 0.09678418 + 
+                                            t * (-0.18628806 + 
+                                            t * ( 0.27886807 + 
+                                            t * (-1.13520398 + 
+                                            t * ( 1.48851587 + 
+                                            t * (-0.82215223 + 
+                                            t * ( 0.17087277))))))))));
+        if (z >= 0) return  ans;
+        else        return -ans;
+    }
+    static double normalDis(double x, double mean, double stdDev){
+        return 0.5*(1+erf((x-mean)/(stdDev*Math.sqrt(2))));
+    }
+    static double digitScale(double d, int scale ){
+        double factor = Math.pow(10,scale);
+        return Math.round(d * factor) / factor; 
+    }
+    public static void main(String[] args) {
+       System.out.println(digitScale(normalDis(19.5,20.0,2.0),3));
+       System.out.println(digitScale(normalDis(22,20.0,2.0)-normalDis(20,20.0,2.0),3));
+    }
+}
+        
